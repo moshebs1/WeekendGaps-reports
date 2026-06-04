@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Headlines Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .timestamp {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .section-badge {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .outlet-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .outlet-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.5);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .outlet-card.success {
+            border-top: 3px solid #22c55e;
+        }
+
+        .outlet-card.error {
+            border-top: 3px solid #ef4444;
+            opacity: 0.7;
+        }
+
+        .outlet-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        }
+
+        .outlet-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .outlet-name:hover {
+            color: #38bdf8;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .status-dot.error {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .headline {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .headline:last-child {
+            margin-bottom: 0;
+        }
+
+        .headline-thumb {
+            flex-shrink: 0;
+            width: 100px;
+            height: 65px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .headline-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .headline-label {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.15);
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+
+        .headline-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            text-decoration: none;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .headline-title:hover {
+            color: #38bdf8;
+            text-decoration: underline;
+        }
+
+        .headline-desc {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .empty-state {
+            padding: 12px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            font-style: italic;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            border: 1px dashed rgba(148, 163, 184, 0.2);
+        }
+
+        .error-msg {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: rgba(127, 29, 29, 0.4);
+            border-left: 3px solid #ef4444;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #fca5a5;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .grid { grid-template-columns: 1fr; }
+            .headline { flex-direction: column; }
+            .headline-thumb { width: 100%; height: 120px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📰 Financial News Dashboard</h1>
+            <div class="timestamp">Last updated: June 04, 2026 at 09:02</div>
+        </header>
+
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🇮🇱 Israeli Markets</h2>
+                <span class="section-badge">5 sources</span>
+            </div>
+            <div class="grid">
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.globes.co.il" class="outlet-name" target="_blank">Globes</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://res.cloudinary.com/globes/image/upload/t_800X392/v1745232970/direct/%D7%A4%D7%99%D7%A9%D7%9E%D7%9F_%D7%9E%D7%99%D7%9E%D7%95%D7%9F_16_%D7%AA%D7%9C_%D7%90%D7%91%D7%99%D7%91_%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%93%D7%99%D7%95%D7%99%D7%93_%D7%9C%D7%95%D7%99%D7%9F_xd91ne.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.globes.co.il/news/article.aspx?did=1001544886" class="headline-title" target="_blank">יזמי נדל"ן בורחים מת"א: "לא כלכלי. עדיף להימנע ממימוש היתרים"</a>
+            <div class="headline-desc">&nbsp;</div>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.globes.co.il/portal/?fid=4969" class="headline-title" target="_blank">ריכוז תוצאות המסחר במניות והמירים</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.themarker.com" class="outlet-name" target="_blank">TheMarker</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://img.haarets.co.il/bs/0000019e-8d5e-d0a9-a7df-bddefa680000/a8/d1/f4b9e666490692d5c8a9f7d2899b/778299.jpg?precrop=1529,889,x390,y464&width=1200&height=630&cmsprod" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.themarker.com/markets/2026-06-04/ty-article/.highlight/0000019e-8d5e-d0a9-a7df-bddefa680000" class="headline-title" target="_blank">ההאטה במכירת דירות הגיעה גם לגדולות. מי התמודדה עם זה טוב יותר?</a>
+            <div class="headline-desc">למרות האטה במכירות, יזמי הנדל"ן הגדולים עדיין מצליחים לייצר רווח גולמי משמעותי ■ ישראל קנדה סיימה את הרבעון בהפסד, דמרי וקרוביו רכשו דירות ב–26 מיליון שקל ורווחי פרשקובסקי גדלו פי 3.5 ■ דו"חות החברות הגדולות מספרים מי הצליחה למכור דירות למרות המלחמה ומי מתמודדת עם ביטולים וקשיים אחרים</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://img.haarets.co.il/bs/0000019e-883a-d0a9-a7df-b9bae1b90000/ab/ef/f1baab4a412c937a95003b990374/208531.jpg?precrop=2200,1279,x0,y64&width=1200&height=630&cmsprod" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.themarker.com/markets/2026-06-03/ty-article/.highlight/0000019e-883a-d0a9-a7df-b9bae1b90000" class="headline-title" target="_blank">יכולת ביצוע או הייפ מוגזם: כך נסקה נופר של ינאי לשווי של 9 מיליארד שקל</a>
+            <div class="headline-desc">עופר ינאי, המנכ"ל ובעל השליטה בחברת האנרגיה נופר מתהדר בקפיצה בשווי ובשיפור בתוצאות — אך שוכח להזכיר שנופר רוכבת על הגאות במניות האנרגיה המתחדשת ■ נופר ממשיכה להציג תשואות חסר בהשוואה למתחרותיה העיקריות — ותוצאותיה התפעוליות דלות ■ נופר: "תחת ינאי כמנכ"ל, חווה נופר תנופה אדירה. המספרים מדברים בעד עצמם"</div>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.calcalist.co.il" class="outlet-name" target="_blank">Calcalist</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.calcalist.co.il/market/article/b1dlls6lme" class="headline-title" target="_blank">אחרי הפסקת האש מול לבנון: הדולר טיפס והתקרב ל-2.88 שקלים</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.calcalist.co.il/market/article/r18s5y0gzx" class="headline-title" target="_blank">רוב העליות בת"א־125 לא נבעו משיפור ברווחי החברות; "השוק מתחיל להתפכח"</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.bizportal.co.il" class="outlet-name" target="_blank">Bizportal</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://res.cloudinary.com/bizportal/image/upload/f_auto,q_auto/giflib/news/rsPhoto/sz_314/rsz_870_420_invest2.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.bizportal.co.il/longtermsavings/news/article/20033365" class="headline-title" target="_blank">איפה הרגולטור? דמי ניהול מופרזים בפוליסות חיסכון</a>
+            <div class="headline-desc">אפילו הבנקים לא "מסדרים" ככה את הציבור; איך חברות הביטוח עושקות את החוסכים בפוליסות חיסכון כספיות?</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://res.cloudinary.com/bizportal/image/upload/f_auto,q_auto/giflib/news/rsPhoto/sz_248/rsz_870_420_BBURSSA.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.bizportal.co.il/capitalmarket/news/article/20033406" class="headline-title" target="_blank">היום בבורסה: טבע תעלה, טאואר תרד</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.ynet.co.il" class="outlet-name" target="_blank">Ynet Economy</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://ynet-pic1.yit.co.il/picserver6/crop_images/2021/05/26/r1kaGToFu/r1kaGToFu_1_73_1280_721_0_large.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.ynet.co.il/economy/article/rjd005a6lgx" class="headline-title" target="_blank">80 מיליון שקל מחפשים זוכה: הגרלת הלוטו הגדולה</a>
+            <div class="headline-desc">הערב מתקיימת ההגרלה הרביעית ברציפות שבה עומד הפרס הראשון על 40 מיליון שקל, ובדאבל לוטו על 80 מיליון, הסכום המקסימלי האפשרי לפי תקנות מפעל הפיס. אם בשלוש ההגרלות הקרובות לא יהיה זוכה - הפרס יחולק בין המנחשים 5 מספרים ולא 6</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://ynet-pic1.yit.co.il/picserver6/crop_images/2026/06/04/HyQbrFRlfg/HyQbrFRlfg_27_0_2860_1611_0_large.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.ynet.co.il/economy/article/rkt2xtagzl" class="headline-title" target="_blank">"עבריינים מאיימים עלינו": ענקית האשפה הפסיקה לנקות את רחובות אשדוד</a>
+            <div class="headline-desc">עיריית אשדוד ביקשה מבית המשפט לחייב את חברת פינוי האשפה ר.ג.א להמשיך לבצע את עבודתה לאחר שהבעלים טען כי הוא ועובדיו מאויימים על ידי עבריינים. אחד מחבר דירקטוריון החברה הוא לא אחר מאשר מפכ"ל משטרת ישראל לשעבר דודי כהן</div>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🌍 Global Markets</h2>
+                <span class="section-badge">8 sources</span>
+            </div>
+            <div class="grid">
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.jpost.com" class="outlet-name" target="_blank">Jerusalem Post Business</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://images.jpost.com/image/upload/f_auto,fl_lossy/q_auto/c_fill,g_faces:center,h_720,w_1280/645367" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.jpost.com/business-and-innovation/all-news/article-898198" class="headline-title" target="_blank">British Airways extends flight cancellations to Israel through October 25 | The Jerusalem Post</a>
+            <div class="headline-desc">British Airways extends flight cancellations to Israel through Oct. 25, halting service to Tel Aviv, Dubai, Bahrain, and Amman, while Etihad expands operations at Ben Gurion Airport.</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://images.jpost.com/image/upload/f_auto,fl_lossy/q_auto/c_fill,g_faces:center,h_720,w_1280/645367" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.jpost.com/business-and-innovation/all-news/article-898198" class="headline-title" target="_blank">British Airways extends flight cancellations to Israel through October 25 | The Jerusalem Post</a>
+            <div class="headline-desc">British Airways extends flight cancellations to Israel through Oct. 25, halting service to Tel Aviv, Dubai, Bahrain, and Amman, while Etihad expands operations at Ben Gurion Airport.</div>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.bloomberg.com" class="outlet-name" target="_blank">Bloomberg</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://assets.bwbx.io/images/users/iqjWHBFdfxIU/ig2KGJT1WSGU/v0/1200x800.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.bloomberg.com/news/articles/2026-06-04/korea-s-wealth-fund-to-tap-alternative-assets-with-tokyo-office" class="headline-title" target="_blank">Korea’s Wealth Fund to Tap Alternative Assets With Tokyo Office</a>
+            <div class="headline-desc">Korea Investment Corp. will open its first office in Tokyo this summer as the $232 billion sovereign wealth fund seeks to expand investments in Japan, including alternative assets such as private equity, hedge funds and private debt.</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://assets.bwbx.io/images/users/iqjWHBFdfxIU/iTcvzhbo1Rp8/v0/1200x675.png" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.bloomberg.com/news/articles/2026-06-03/asian-stocks-set-to-fall-on-fresh-us-iran-clashes-markets-wrap" class="headline-title" target="_blank">Asian Stocks Set to Fall on Fresh US-Iran Clashes: Markets Wrap</a>
+            <div class="headline-desc">Stocks pulled back from record levels after a weak forecast from Broadcom Inc. dented momentum in the artificial-intelligence trade that has driven markets higher this year.</div>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.ft.com" class="outlet-name" target="_blank">Financial Times</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://images.ft.com/v3/image/raw/https%3A%2F%2Fd1e00ek4ebabms.cloudfront.net%2Fproduction%2F191417a4-678e-4e35-b2b3-f951ef6440dc.jpg?source=next-barrier-page" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.ft.com/content/95286aa1-ee55-4a45-86b8-951cc0fb23a8" class="headline-title" target="_blank">Elon Musk’s SpaceX pitches investors $1.8tn valuation in historic IPO</a>
+            <div class="headline-desc">Rocket and AI group is seeking to raise up to $86bn in biggest Wall Street debut of all time</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://images.ft.com/v3/image/raw/https%3A%2F%2Fd1e00ek4ebabms.cloudfront.net%2Fproduction%2Fa2c72a2a-e830-4755-91fd-bd4af87dc98a.jpg?source=next-barrier-page" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.ft.com/content/07bd20ef-d95d-431b-922b-6b03c4be2b31" class="headline-title" target="_blank">Andrew Left’s fraud conviction leaves Wall Street asking: what are the rules?</a>
+            <div class="headline-desc">Guilty verdict for famed short seller raises questions on line between public commentary and illegal trading</div>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.reuters.com" class="outlet-name" target="_blank">Reuters</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://www.reuters.com/resizer/v2/4ALYLI7YOFJOTIGHSQSEH3TBBU.jpg?auth=8c18138997ca0c1592dc6d4db1303258e9fe373a88cea248f296133dbc85a7a9&amp;smart=true&amp;width=1920" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.reuters.com/world/asia-pacific/dollar-clings-2-month-high-gulf-hostilities-flare-yen-wobbles-near-intervention-2026-06-04/" class="headline-title" target="_blank">Dollar at 2-month high as Gulf hostilities flare, yen wobbles near intervention zone</a>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://www.reuters.com/resizer/v2/IIHFEZFVIVPM7HM5B2TZG7AFQY.jpg?auth=e7c6c0201eb2e23d4bb373c6280d2556535485f816b6571ed0ee7962c3be3f0a&amp;smart=true&amp;width=1920" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.reuters.com/world/asia-pacific/australias-central-bank-monitoring-impact-higher-rates-energy-price-shock-2026-06-04/" class="headline-title" target="_blank">Australia's central bank monitoring impact of higher rates, energy price shock</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.wsj.com" class="outlet-name" target="_blank">Wall Street Journal</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://news.google.com/rss/articles/CBMieEFVX3lxTE8wY0x4bjdLN01XZklMLTBaUTk4b3hvNF83ZHdtaGVNWmNPR0NCdkMwYUNBa2FlRlRvNU9uVXRzUmlrcmpFVEV6QXBkb0d2LXBNeE1fUU5ydnpCa3FIc2RNam5aeVBPREVNdFdVVThZVFYzeFgxUG4wZg?oc=5" class="headline-title" target="_blank">Why It Matters if OpenAI or Anthropic Wins the IPO Race</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://news.google.com/rss/articles/CBMivwFBVV95cUxQM2YyVDE5WlpJVWlfZzRWT1loTzVNRjRMUTV6cERFZmhwTjBPSTctWWs1QjBPbmJZMkpmMVBXTTRrUDZrY2NGdGd2N0dWNzlfdzRwTGRDV1Z0X0l3aWFWOGVvYkpWU2NGRWVMZWRzVlB3alNUUjJtbVlsblFjbTZSa19rY3ZhalRFX1VybWo0QkJNMU1BOFhSUmlqb1ZBZXpIWTA1dW1KeVVyanp4MnBEbHhoMmc3ZWlLNi1MVk1vWQ?oc=5" class="headline-title" target="_blank">Big Banks Are Raking In Profits as Market Turbulence Shows No Signs of Easing</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.cnbc.com" class="outlet-name" target="_blank">CNBC</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://image.cnbcfm.com/api/v1/image/108313293-1779985301248-gettyimages-2264128506-raa-broadcom260303_npRyT.jpeg?v=1779985322&w=1920&h=1080" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.cnbc.com/2026/06/03/stocks-making-the-biggest-moves-after-hours-avgo-crwd-pvh.html" class="headline-title" target="_blank">Stocks making the biggest moves after hours: Broadcom, CrowdStrike, PVH & more</a>
+            <div class="headline-desc">See which stocks are posting big moves after the bell.</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://image.cnbcfm.com/api/v1/image/108316490-17805455711780545568-46337232091-1080pnbcnews.jpg?v=1780545570&w=1920&h=1080" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.cnbc.com/video/2026/06/04/china-bonds-attractive-to-investors-seeking-diversification.html" class="headline-title" target="_blank">Panda bonds gain traction as investors seek diversified, stable Yuan assets: AllianceBernstein</a>
+            <div class="headline-desc">Eric Liu from AllianceBernstein explans why there is growing interest in China's onshore bonds.</div>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://finance.yahoo.com" class="outlet-name" target="_blank">Yahoo Finance</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://finance.yahoo.com/markets/stocks/article/spacex-confirms-it-will-seek-75-billion-in-record-ipo-213415033.html" class="headline-title" target="_blank">SpaceX confirms it will seek $75B in record IPO</a>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://s.yimg.com/uu/api/res/1.2/Ps5ofeqgXNgBxd_DTQPb3g--~B/Zmk9ZmlsbDtoPTE0MDtweW9mZj0wO3c9MTQwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/prnewswire.com/35dc8a34b286af4689d47a31c87d63c9" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://finance.yahoo.com/sectors/energy/articles/paratus-energy-ex-dividend-usd-054800210.html" class="headline-title" target="_blank">Paratus Energy: Ex Dividend USD 0.22 per share today</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.investing.com" class="outlet-name" target="_blank">Investing.com</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://i-invdn-com.investing.com/news/wallstreet_800x533_L_1412060179.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.investing.com/news/stock-market-news/us-stock-futures-steady-after-wall-st-ekes-out-record-high-iran-jitters-persist-4723213" class="headline-title" target="_blank">Stocks end lower as U.S.-Iran tensions rise, S&P 500 snaps nine-day win streak By Investing.com</a>
+            <div class="headline-desc">Stocks end lower as U.S.-Iran tensions rise, S&P 500 snaps nine-day win streak</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://i-invdn-com.investing.com/news/fa8a2f803ea2ddf92359d55091dcde0a_L.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.investing.com/news/stock-market-news/tsmc-chief-expects-continued-aidriven-growth-at-chipmaker-93CH-4725694" class="headline-title" target="_blank">TSMC chief expects continued AI-driven growth at chipmaker By Investing.com</a>
+            <div class="headline-desc">TSMC chief expects continued AI-driven growth at chipmaker</div>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>
