@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Headlines Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .timestamp {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .section-badge {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .outlet-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .outlet-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.5);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .outlet-card.success {
+            border-top: 3px solid #22c55e;
+        }
+
+        .outlet-card.error {
+            border-top: 3px solid #ef4444;
+            opacity: 0.7;
+        }
+
+        .outlet-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        }
+
+        .outlet-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .outlet-name:hover {
+            color: #38bdf8;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .status-dot.error {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .headline {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .headline:last-child {
+            margin-bottom: 0;
+        }
+
+        .headline-thumb {
+            flex-shrink: 0;
+            width: 100px;
+            height: 65px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .headline-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .headline-label {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.15);
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+
+        .headline-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            text-decoration: none;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .headline-title:hover {
+            color: #38bdf8;
+            text-decoration: underline;
+        }
+
+        .headline-desc {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .empty-state {
+            padding: 12px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            font-style: italic;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            border: 1px dashed rgba(148, 163, 184, 0.2);
+        }
+
+        .error-msg {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: rgba(127, 29, 29, 0.4);
+            border-left: 3px solid #ef4444;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #fca5a5;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .grid { grid-template-columns: 1fr; }
+            .headline { flex-direction: column; }
+            .headline-thumb { width: 100%; height: 120px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📰 Financial News Dashboard</h1>
+            <div class="timestamp">Last updated: June 15, 2026 at 09:02</div>
+        </header>
+
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🇮🇱 Israeli Markets</h2>
+                <span class="section-badge">5 sources</span>
+            </div>
+            <div class="grid">
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.globes.co.il" class="outlet-name" target="_blank">Globes</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://res.cloudinary.com/globes/image/upload/t_800X392/v1779178411/direct/AP26070525672326_xdxqr8.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.globes.co.il/news/article.aspx?did=1001545861" class="headline-title" target="_blank">פרץ של שמחה אחז במנהיגי העולם וסיפק לישראל עוד סיבה לדאגה</a>
+            <div class="headline-desc">&nbsp;</div>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.globes.co.il/portal/?fid=4969" class="headline-title" target="_blank">ריכוז תוצאות המסחר במניות והמירים</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.themarker.com" class="outlet-name" target="_blank">TheMarker</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://img.haarets.co.il/bs/0000019e-c033-dd0a-a19f-d37f4d160000/4f/ca/6ffc13964bbcaf4ed5fc7dd8b25a/372184.jpg?&width=1200&height=630&cmsprod" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.themarker.com/wallstreet/2026-06-15/ty-article-live/0000019e-c033-dd0a-a19f-d37f4d160000" class="headline-title" target="_blank">טוקיו וסיאול קופצות ביותר מ-5%; הנפט נופל ב-5% בעקבות ההסכם עם איראן</a>
+            <div class="headline-desc">טראמפ הודיע כי הסגר הימי על איראן יוסר באופן מיידי וכתב ברשת החברתית שלו:  "ספינות העולם, התניעו מנועים. תנו לנפט לזרום!" ■ הדולר נחלש מול מטבעות מרכזיים בעולם</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://img.haarets.co.il/bs/0000019e-c03f-dd0a-a19f-d37fa8470000/c7/0b/406eb9884880b4475c47f68b1143/345212.jpg?&width=1200&height=630&cmsprod" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.themarker.com/markets/2026-06-14/ty-article/.highlight/0000019e-c03f-dd0a-a19f-d37fa8470000" class="headline-title" target="_blank">מכון ויצמן השקיע: נחשפים המספרים של קרן התשתיות הגדולה בישראל</a>
+            <div class="headline-desc">דו"חות קרן נוי 5 חושפים כי הקרן, שהגדילה את התחייבויות המשקיעים לכמעט 2 מיליארד שקל, כבר רשמה תשואה פנימית שנתית ממוצעת של 13.2% על השקעותיה ■ התשואה נתמכה בשיערוכים חיוביים של בינת דאטה סנטרס, פרויקטי אגירת אנרגיה, חברת הסיבים IBC וההשקעה בנמל המפרץ — עוד לפני שלב המימושים המרכזי של הקרן</div>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.calcalist.co.il" class="outlet-name" target="_blank">Calcalist</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.calcalist.co.il/market/article/onhjfioqf" class="headline-title" target="_blank">ההכרזה על הסכם מקפיצה את בורסות טוקיו וסיאול ביותר מ-5%, הנפט נופל</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.calcalist.co.il/market/article/onhjfioqf" class="headline-title" target="_blank">ההכרזה על הסכם מקפיצה את בורסות טוקיו וסיאול ביותר מ-5%, הנפט נופל ב-5%</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.bizportal.co.il" class="outlet-name" target="_blank">Bizportal</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://res.cloudinary.com/bizportal/image/upload/f_auto,q_auto/giflib/news/rsPhoto/sz_309/rsz_870_420_wallss1.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.bizportal.co.il/globalmarkets/news/article/20033924" class="headline-title" target="_blank">איראן חתמה על הסכם: אסיה עולה 5%, הנפט נופל 5%; החוזים מזנקים עד 1.8%</a>
+            <div class="headline-desc">עיקרי ההסכם, מה יקרה במצר הורמוז והאם זה סוף העימות?</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://res.cloudinary.com/bizportal/image/upload/f_auto,q_auto/giflib/news/rsPhoto/sz_298/rsz_870_420_אייל_רביד_מנכל_ויקטורי_קרדיט_צילום_שלומי_יוסף_1_1.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.bizportal.co.il/capitalmarket/news/article/20033917" class="headline-title" target="_blank">חוסר השקיפות של אייל רביד: הצמיחה של ויקטורי היא מכירות לעזה</a>
+            <div class="headline-desc">ויקטורי הפתיעה חודש שעבר עם דוחות נהדרים לרבעון הראשון - צמיחה מטאורית ביחס לקולגות שלה. אבל אין קסמים - אלו עסקאות מכירה ענקיות לעזה; רק חודש אחרי ובהתערבות רשות ניירות ערך התברר שרוב הגידול - כ-100 מיליון שקל נובע ממכירות לעזה</div>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.ynet.co.il" class="outlet-name" target="_blank">Ynet Economy</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://ynet-pic1.yit.co.il/picserver6/crop_images/2026/06/08/BkzKLhQbfl/BkzKLhQbfl_0_0_850_479_0_large.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.ynet.co.il/economy/article/rkbs5xtzzg" class="headline-title" target="_blank">בעקבות ההסכם בין ארה"ב לאיראן: מחירי הנפט צונחים, הדולר יורד לכ-2.90 שקלים</a>
+            <div class="headline-desc">על רקע ההבנות לסיום המלחמה בין האמריקנים לאיראנים והפתיחה הצפויה של מצר הורמוז, חבית ברנט נסחרת ב-83 דולר, קרוד (WTI) ב-80 דולר. הדולר שוב צונח, לאחר שכבר טיפס ל-2.97 שקלים ביום שישי, גם האירו בירידה לעומת השקל. טראמפ: "ספינות העולם - תדליקו את המנועים"</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://ynet-pic1.yit.co.il/picserver6/crop_images/2026/06/08/BkzKLhQbfl/BkzKLhQbfl_0_0_850_479_0_large.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.ynet.co.il/economy/article/rkbs5xtzzg" class="headline-title" target="_blank">בעקבות ההסכם בין ארה"ב לאיראן: מחירי הנפט צונחים, הדולר יורד לכ-2.90 שקלים</a>
+            <div class="headline-desc">על רקע ההבנות לסיום המלחמה בין האמריקנים לאיראנים והפתיחה הצפויה של מצר הורמוז, חבית ברנט נסחרת ב-83 דולר, קרוד (WTI) ב-80 דולר. הדולר שוב צונח, לאחר שכבר טיפס ל-2.97 שקלים ביום שישי, גם האירו בירידה לעומת השקל. טראמפ: "ספינות העולם - תדליקו את המנועים"</div>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🌍 Global Markets</h2>
+                <span class="section-badge">8 sources</span>
+            </div>
+            <div class="grid">
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.jpost.com" class="outlet-name" target="_blank">Jerusalem Post Business</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://images.jpost.com/image/upload/f_auto,fl_lossy/q_auto/c_fill,g_faces:center,h_720,w_1280/725612" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.jpost.com/business-and-innovation/article-899348" class="headline-title" target="_blank">Digital recreation is reshaping the global gaming economy through innovation | The Jerusalem Post</a>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://images.jpost.com/image/upload/f_auto,fl_lossy/q_auto/c_fill,g_faces:center,h_720,w_1280/725612" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.jpost.com/business-and-innovation/article-899348" class="headline-title" target="_blank">Digital recreation is reshaping the global gaming economy through innovation | The Jerusalem Post</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.bloomberg.com" class="outlet-name" target="_blank">Bloomberg</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://assets.bwbx.io/images/users/iqjWHBFdfxIU/i2yrA8LYVN_Y/v1/1200x-1.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.bloomberg.com/news/articles/2026-06-14/hong-kong-issuers-seek-to-boost-trading-in-overlooked-stocks" class="headline-title" target="_blank">Hong Kong Issuers Seek to Boost Trading in Overlooked Stocks</a>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://assets.bwbx.io/images/users/iqjWHBFdfxIU/iciVHPcs1wfc/v1/1200x-1.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.bloomberg.com/news/articles/2026-06-14/us-futures-climb-oil-falls-on-iran-peace-deal-markets-wrap" class="headline-title" target="_blank">Stocks Rally With Bonds as Iran Deal Spurs Relief: Markets Wrap</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.ft.com" class="outlet-name" target="_blank">Financial Times</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://images.ft.com/v3/image/raw/https%3A%2F%2Fd1e00ek4ebabms.cloudfront.net%2Fproduction%2Fc2bc80a6-8f31-412e-b26a-fb00f2ea3a75.jpg?source=next-article&fit=scale-down&quality=highest&width=700&dpr=1" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.ft.com/content/76bed6e5-ab1f-43ff-a6c0-ae5e7cdbf3c1" class="headline-title" target="_blank">Iran and US agree deal to open Strait of Hormuz and extend ceasefire</a>
+            <div class="headline-desc">Leaders to sign agreement on Friday for reopening of waterway and end to US naval blockade of Iranian ports</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://images.ft.com/v3/image/raw/https%3A%2F%2Fd1e00ek4ebabms.cloudfront.net%2Fproduction%2F0ebb57fd-8d2a-4bc2-9085-71e988f0a49d.jpg?source=next-article&fit=scale-down&quality=highest&width=700&dpr=1" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.ft.com/content/9d8b31b0-1269-458e-b831-9b5e079e564e" class="headline-title" target="_blank">Oil touches three-month low after Donald Trump says US close to Iran deal</a>
+            <div class="headline-desc">Stocks and government bonds make gains on hopes energy shock will ease</div>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.reuters.com" class="outlet-name" target="_blank">Reuters</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://www.reuters.com/resizer/v2/TJVRNE26QFOKFIK7TXM2RXRZB4.jpg?auth=1e57923f849e3ccd3846768bf6a76aa4a32aebca063cb3d8ac58c7664e05f1ed&amp;smart=true&amp;width=1920" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.reuters.com/world/asia-pacific/forex-dollar-hits-10-day-low-us-iran-reach-peace-deal-2026-06-15/" class="headline-title" target="_blank">Dollar hits 10-day low as US, Iran reach peace deal</a>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://www.reuters.com/resizer/v2/5OZDSOJR3BNRJOJZLX5XXEVFE4.jpg?auth=0984c885edace6411ea6e77b300cf8d13e0ee28b4d8b4fd3b9fe1a406addec57&amp;smart=true&amp;width=1920" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.reuters.com/world/asia-pacific/iran-us-agree-halt-war-reopen-hormuz-sending-oil-prices-tumbling-2026-06-15/" class="headline-title" target="_blank">Iran, US agree to halt war and reopen Hormuz, sending oil prices tumbling</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.wsj.com" class="outlet-name" target="_blank">Wall Street Journal</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://news.google.com/rss/articles/CBMikgFBVV95cUxQYkZvTl80MlVBSGxQNFRlTkE0LWpORm9ETThTVWdHdFFzZk9aOVVTSk52NHVtUkxMeERyWW1SRzlIOG8zRnNkUjFYUEFFNHltaHVvelNXeEYwV1dFZ3o1M0JQVFItZUJkdEVIR0k1NTRQWlBZV2ExcklCSjM4X0QwclRjQktIMUppeWZNWmE3NV9SUQ?oc=5" class="headline-title" target="_blank">Wall Street Is Rushing to Fund the AI Bonanza in Every Conceivable Way</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://news.google.com/rss/articles/CBMilgFBVV95cUxNSk1kRVZ6eDdSNVBvckV2eWNKazEwazI3b21hc0xvN3FPNUFZdjFoUG1vOHJuME9XTWRYYVhyYmZsRkNQbV9RY1pTeF94Rjg3WDJNUnhpbG9BcEJXZHQ5Z0dvSmVjZTRZaG96UV9TRXo5X0swTjRxR0VFRG9MS2todEZfMjBMWVlmM19mazUzZ05fcVpkUWc?oc=5" class="headline-title" target="_blank">Trump Regulator Proposes New Rules on What’s Allowed on Prediction Markets</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.cnbc.com" class="outlet-name" target="_blank">CNBC</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://image.cnbcfm.com/api/v1/image/108320324-1781190014423-gettyimages-2281074833-anotherday224778236_opkukh1v.jpeg?v=1781190087&w=1920&h=1080" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.cnbc.com/2026/06/14/stock-market-today-live-updates.html" class="headline-title" target="_blank">U.S. stock futures jump on Iran deal to end the war; Japan's Nikkei surges 5%: Live updates</a>
+            <div class="headline-desc">The three major indexes are coming off a winning week.</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://image.cnbcfm.com/api/v1/image/108321652-17814826381781482635-46550044839-1080pnbcnews.jpg?v=1781482637&w=1920&h=1080" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.cnbc.com/video/2026/06/15/the-us-iran-peace-deal-will-give-the-markets-some-breathing-space.html" class="headline-title" target="_blank">The U.S.-Iran peace deal will give the markets some 'breathing space', says HSBC's Willem Sels</a>
+            <div class="headline-desc">Willem Sels, global CIO of HSBC Private Bank and Premier Wealth, says that the signing of a peace deal between the U.S. and Iran won't immediately resolve the real economic effects that are already filtering through, and that this will ultimately lead to mark-to-market volatility, but not a market correction. He also discusses his outlook on central bank rate policy ahead of the FOMC and BOJ decisions.</div>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://finance.yahoo.com" class="outlet-name" target="_blank">Yahoo Finance</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://finance.yahoo.com/markets/stocks/live/stock-market-today-monday-june-15-224751171.html" class="headline-title" target="_blank">US stock futures jump after US and Iran reach peace deal</a>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://s.yimg.com/uu/api/res/1.2/dkx42uV8jsxMRZh0K9Wz3g--~B/aD00ODA7dz0zNjA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/business-wire.com/08895351909eeb71ae696beb408099b7" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://finance.yahoo.com/markets/stocks/articles/novatus-global-appoints-andrew-pinnington-060000584.html" class="headline-title" target="_blank">Novatus Global Appoints Andrew Pinnington as Chief Customer Officer</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.investing.com" class="outlet-name" target="_blank">Investing.com</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <img src="https://i-invdn-com.investing.com/news/moved_LYNXMPEM570UR_L.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.investing.com/news/economy-news/trump-says-iran-deal-could-be-signed-sunday-tehran-disputes-timing-4741061" class="headline-title" target="_blank">US, Iran reach peace deal; Trump says Strait of Hormuz to reopen By Investing.com</a>
+            <div class="headline-desc">US, Iran reach peace deal; Trump says Strait of Hormuz to reopen</div>
+        </div>
+    </div>
+    <div class="headline">
+        <img src="https://i-invdn-com.investing.com/news/https://i-invdn-com.investing.com/trkd-images/LYNXMPEM5C096_L.jpg" class="headline-thumb" onerror="this.style.display='none'" alt="">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.investing.com/news/stock-market-news/two-phones-and-an-app-how-russians-skirt-putins-digital-iron-curtain-4741203" class="headline-title" target="_blank">Two phones and an app: How Russians skirt Putin’s digital iron curtain By Reuters</a>
+            <div class="headline-desc">Two phones and an app: How Russians skirt Putin’s digital iron curtain</div>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>
