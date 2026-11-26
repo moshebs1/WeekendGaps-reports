@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Headlines Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .timestamp {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .section-badge {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .outlet-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .outlet-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.5);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        .outlet-card.success {
+            border-top: 3px solid #22c55e;
+        }
+
+        .outlet-card.error {
+            border-top: 3px solid #ef4444;
+            opacity: 0.7;
+        }
+
+        .outlet-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        }
+
+        .outlet-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .outlet-name:hover {
+            color: #38bdf8;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .status-dot.error {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+        }
+
+        .headline {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .headline:last-child {
+            margin-bottom: 0;
+        }
+
+        .headline-thumb {
+            flex-shrink: 0;
+            width: 100px;
+            height: 65px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .headline-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .headline-label {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.15);
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+        }
+
+        .headline-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            text-decoration: none;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .headline-title:hover {
+            color: #38bdf8;
+            text-decoration: underline;
+        }
+
+        .headline-desc {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .empty-state {
+            padding: 12px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            font-style: italic;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            border: 1px dashed rgba(148, 163, 184, 0.2);
+        }
+
+        .error-msg {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: rgba(127, 29, 29, 0.4);
+            border-left: 3px solid #ef4444;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #fca5a5;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .grid { grid-template-columns: 1fr; }
+            .headline { flex-direction: column; }
+            .headline-thumb { width: 100%; height: 120px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📰 Financial News Dashboard</h1>
+            <div class="timestamp">Last updated: November 26, 2026 at 09:04</div>
+        </header>
+
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🇮🇱 Israeli Markets</h2>
+                <span class="section-badge">5 sources</span>
+            </div>
+            <div class="grid">
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.globes.co.il" class="outlet-name" target="_blank">Globes</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.globes.co.il/news/article.aspx?did=1001565057" class="headline-title" target="_blank">צבי סטפק מציג: חמישה כללים למשקיע שחושש מהטלטלות בוול סטריט שבוע מטלטל עובר על וול סטריט • מה שנראה ביום שני כמו ראלי היסטורי הפך במהרה לירידות חדות, שבהמשך התמתנו • מה יעשה המשקיע שמתקשה להכריע האם השווקים צועדים לקראת מפולת או גל של עליות? יחזור לכללים הבסיסיים של שוק ההון • וגם: מדוע לדעתי החזרה של ג׳נסן הואנג היא בשורה רעה לאנבידיה? צבי סטפק 05:27</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.globes.co.il/portal/?fid=4969" class="headline-title" target="_blank">ריכוז תוצאות המסחר במניות והמירים</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.themarker.com" class="outlet-name" target="_blank">TheMarker</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.themarker.com/markets/2026-11-26/ty-article/.premium/000001a2-1665-ded0-a5b6-d665904b0000" class="headline-title" target="_blank">דו"חות דמרי: ירידה במספר הדירות שנמכרו, ותזרים שלילי של חצי מיליארד ש'</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.themarker.com/markets/2026-11-25/ty-article/.highlight/000001a2-0e07-d089-a1fe-2f779dd70000" class="headline-title" target="_blank">מזינוק - לנפילה של מיליארדים: הצרות של עופר ינאי בנופר</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.calcalist.co.il" class="outlet-name" target="_blank">Calcalist</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE5CVTM2QnpFUFBMSEZfdTJSbzdqVERDdUF2dlRDNXZwWkFkMFdaUm41UmNMdldtSE9lTnB4MmN1Y1c4LWF3WHQ0eGVrMTgwREwwV3lWZEtiTjJMU2IxOGxocw?oc=5" class="headline-title" target="_blank">כלכליסט - חדשות הכלכלה, שוק ההון, הייטק ונדל"ן בישראל | כלכליסט - כלכליסט</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://news.google.com/rss/articles/CBMiY0FVX3lxTE1WeVFSTFFLb1BVU19iUHdPaDgyQ0NOdnd4M2R4OTRmUnFpQWZJeld5Tm1BS2JtVkdLWURUU0FNMGlsTWZJazdoVk9lS3A3UUNjV1VJNFRaTXNyeE4za1QycFZodw?oc=5" class="headline-title" target="_blank">ת"א 35 יורחב לת"א 50: הבורסה מתכננת רפורמה במדדים המרכזיים - כלכליסט</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.bizportal.co.il" class="outlet-name" target="_blank">Bizportal</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.bizportal.co.il/realestates/news/article/20050197" class="headline-title" target="_blank">המחירים בפרויקט של דמרי בשדה דב ירדו ב-11%%: 11 דירות נמכרו השנה</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.bizportal.co.il/capitalmarket/news/article/20050193" class="headline-title" target="_blank">המנכ"ל של אלארום עוזב אחרי שהמניה איבדה 98% מערכה</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.ynet.co.il" class="outlet-name" target="_blank">Ynet Economy</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.ynet.co.il/economy/article/yokra14970022" class="headline-title" target="_blank">תוכנית האוצר לגביית מס של 40 מיליארד שקל: כך זה יפגע בכיס שלכם</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.ynet.co.il/economy/article/bk6i008ekxx" class="headline-title" target="_blank">האוצר והרשות לתחבורה ציבורית נגד הרכבת: "גישה לעומתית וגרירת רגליים"</a>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🌍 Global Markets</h2>
+                <span class="section-badge">5 sources</span>
+            </div>
+            <div class="grid">
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.jpost.com" class="outlet-name" target="_blank">Jerusalem Post Business</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.jpost.com/business-and-innovation/all-news/article-916145" class="headline-title" target="_blank">From service to growth: Israeli nonprofit helps IDF reservists rebuild, sustain their own business</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.jpost.com/business-and-innovation/all-news/article-916145" class="headline-title" target="_blank">From service to growth: Israeli nonprofit helps IDF reservists rebuild, sustain their own business</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.bloomberg.com" class="outlet-name" target="_blank">Bloomberg</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.bloomberg.com/news/articles/2026-11-26/gold-edges-lower-as-us-inflation-data-fuels-bets-for-rate-hikes" class="headline-title" target="_blank">Gold Wavers After Battering as Traders Assess Fed Path, AI Angst</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.bloomberg.com/news/articles/2026-11-25/stock-market-today-dow-s-p-live-updates" class="headline-title" target="_blank">Stocks, Nasdaq Futures Climb as AI Trade Rebounds: Markets Wrap</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.reuters.com" class="outlet-name" target="_blank">Reuters</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://news.google.com/rss/articles/CBMivwFBVV95cUxPVTIxbElDQVJDWHlhZ1FpYkZUYnVoNGxvNGZFU3BKTXpoR1Bfck1icUV2OHdGVW5aSEp6ak15Um5GSGgzbFF3ZEdZS2JudHJsZVZ5VnJMSDVnMVdBOTZKRUtJX1ZXQmotWjhqeHFuSV83U01LLUtWcHB5dEZHSEFza0tlSVc2ZlBKclJyWV9NS1pSaWJoRHN0c19SWlBpV2F0aFA5YVZRQ1oxeGxkTDNJZG5UeThHRTR1WUl5U2djSQ?oc=5" class="headline-title" target="_blank">Wall St Week Ahead 'Black Friday' brings consumer spending into focus for AI-rocked market</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://news.google.com/rss/articles/CBMioAFBVV95cUxQeGRxVzhWY18xWGQzRlVEbmZBbU9lcnR5WEpveVIybFY3X0I5bVNXN2Q2NWZUTUl6eGJYQUZoeHEwSFJqYzhGZDV4Yk9OV29Qc0dXSXFEbm9PY09FQlhNWVlQb2ZEN0FlelZvQVJyT2N3WU42X3phd3ZYVVczQ0RORDFwaW5vd0NxTnozeEpYU3VIVF9NcGtGYng0VWRnT0hk?oc=5" class="headline-title" target="_blank">Dollar rally takes a pause for Thanksgiving</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.wsj.com" class="outlet-name" target="_blank">Wall Street Journal</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://news.google.com/rss/articles/CBMiggFBVV95cUxNb1hDWVpqdTVtcXJfZmw5eWdIaTdsUFB1ZU9fWVoxOG1YMUhtLWFQeHEyWGctV0ZXc3ZwRHFtNndpdVNrMVJnYjZVUnJlMU5YZnBXY1lYdHdpVTA3MmxkMzRpbWFDaG1ocmItQWR1VXNpbDR2NHRndUJRZ2hDWTlBZ213?oc=5" class="headline-title" target="_blank">Financial Services Roundup: Market Talk</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://news.google.com/rss/articles/CBMixgFBVV95cUxQNHFQOEdMZm5FNmNuNWo3WHNuNHhBVkprTmplTktaZ1J5Ni0wN0NBdHF5YWg5X2pfc09rZldBYU80NWVCNTRRZDVsb1RfVkRHdFBseWh5VmZieU45WnhMb0JpNEFkZHlCRXp1Y1FMb1M0WjNEWGk0MjBJb3V5eGRtQmVaVzBWaWtPeUhOX1hleHkteHRNN2JUekRTMGpTYmtuMTNKNUdZZG8xWF9iSzYzT3kzaUEzbkYzZ0NsT281aHl6U1FDWUE?oc=5" class="headline-title" target="_blank">Anthropic Committed to Spend $900 Billion. Wall Street Expects Its Debt to Be Junk.</a>
+        </div>
+    </div>
+</div>
+<div class="outlet-card success">
+    <div class="outlet-header">
+        <a href="https://www.cnbc.com" class="outlet-name" target="_blank">CNBC</a>
+        <span class="status-dot success"></span>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">top</span>
+            <a href="https://www.cnbc.com/2026/11/25/openai-ipo-odds-2027-prediction-markets.html" class="headline-title" target="_blank">Prediction markets push OpenAI IPO expectations later into 2027</a>
+        </div>
+    </div>
+    <div class="headline">
+        <div class="headline-content">
+            <span class="headline-label">markets</span>
+            <a href="https://www.cnbc.com/2026/11/26/nvidia-market-governance-risk.html" class="headline-title" target="_blank">S&P warns Nvidia credit rating could be cut over 'rising' management and governance risk</a>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>
